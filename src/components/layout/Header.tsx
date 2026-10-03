@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type RefObject } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../lib/auth/AuthProvider'
 import { Icon } from '../ui/Icon'
@@ -8,7 +8,7 @@ const titles: Record<string, string> = {
   '/scripts': 'Scripts', '/biblioteca': 'Biblioteca', '/importacao': 'Importação', '/configuracoes': 'Configurações',
 }
 
-export function Header({ onMenu }: { onMenu: () => void }) {
+export function Header({ onMenu, menuOpen, menuButtonRef }: { onMenu: () => void; menuOpen: boolean; menuButtonRef: RefObject<HTMLButtonElement | null> }) {
   const { user, signOut, error } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
@@ -25,7 +25,7 @@ export function Header({ onMenu }: { onMenu: () => void }) {
   }
 
   return <header className="topbar">
-    <button className="icon-button mobile-menu" onClick={onMenu} aria-label="Abrir navegação"><Icon name="menu" /></button>
+    <button ref={menuButtonRef} className="icon-button mobile-menu" onClick={onMenu} aria-label={menuOpen ? 'Fechar navegação' : 'Abrir navegação'} aria-expanded={menuOpen} aria-controls="primary-navigation"><Icon name="menu" /></button>
     <div className="topbar-heading"><span className="topbar-context">Lumio Dev</span><Icon name="chevron" /><span>{title}</span></div>
     <div className="topbar-actions"><span className="user-chip" title={user?.email ?? ''}><span className="avatar">{user?.email?.slice(0, 1).toUpperCase() ?? 'L'}</span><span className="user-email">{user?.email}</span></span>
       <button className="logout-button" onClick={logout} disabled={busy}><Icon name="logout" /><span>{busy ? 'Saindo…' : 'Sair'}</span></button>

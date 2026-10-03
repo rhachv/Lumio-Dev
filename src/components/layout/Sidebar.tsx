@@ -10,7 +10,7 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
   ] as const
   return <>
     {open && <button className="drawer-scrim" aria-label="Fechar menu" onClick={onClose} />}
-    <aside className={`sidebar${open ? ' sidebar--open' : ''}`} aria-label="Navegação principal">
+    <aside id="primary-navigation" className={`sidebar${open ? ' sidebar--open' : ''}`} aria-label="Navegação principal">
       <div className="sidebar-top"><Logo /><button className="icon-button sidebar-close" onClick={onClose} aria-label="Fechar navegação"><Icon name="close" /></button></div>
       <div className="nav-caption">ESPAÇO DE TRABALHO</div>
       <nav className="nav-list">

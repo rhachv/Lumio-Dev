@@ -14,7 +14,7 @@
   --color-border-strong: #d8dbe1;
   --color-text: #15171b;
   --color-text-secondary: #60656f;
-  --color-text-muted: #8a909a;
+  --color-text-muted: #6f7682;
   --color-accent: #002fa7;
   --color-accent-hover: #002783;
   --color-accent-soft: #edf2ff;
@@ -54,6 +54,7 @@
   --radius-pill: 999px;
   --shadow-popover: 0 16px 42px rgb(21 23 27 / 12%);
   --shadow-focus: 0 0 0 3px rgb(0 47 167 / 16%);
+  --outline-focus: 0 0 0 3px rgb(0 47 167 / 25%);
   --transition-fast: 140ms ease;
   --transition-normal: 220ms ease;
   --sidebar-width: 252px;
