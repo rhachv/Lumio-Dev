@@ -77,6 +77,13 @@ export type Proposal = {
 export type ProposalListItem = Proposal & { lead_company_name: string | null; client_company_name: string | null }
 export type ProposalStatusHistory = { id: string; user_id: string; proposal_id: string; previous_status: ProposalStatus | null; new_status: ProposalStatus; changed_at: string }
 export type ProposalSummary = { status: ProposalStatus; proposal_count: number; total_value: number }
+export type DashboardSummary = {
+  leads_total: number; blocked_leads: number; leads_by_status: Record<string, number>; clients_total: number;
+  projects_total: number; projects_by_status: Record<string, number>; proposals_total: number;
+  proposals_by_status: Record<string, number>; proposal_open_value: number; proposal_accepted_value: number; proposal_total_value: number
+}
+export type DashboardActivity = { id: string; entity_type: 'lead' | 'interaction' | 'project' | 'proposal'; entity_name: string; occurred_at: string; description: string; href: string }
+export type DashboardRecentProposal = { id: string; title: string; service: string; value: number | null; status: ProposalStatus; updated_at: string; lead_company_name: string | null; client_company_name: string | null }
 
 export type Database = {
   public: {
@@ -239,6 +246,18 @@ export type Database = {
       proposal_summary: {
         Args: Record<string, never>
         Returns: ProposalSummary[]
+      }
+      get_dashboard_summary: {
+        Args: Record<string, never>
+        Returns: DashboardSummary[]
+      }
+      get_dashboard_recent_proposals: {
+        Args: Record<string, never>
+        Returns: DashboardRecentProposal[]
+      }
+      get_dashboard_recent_activity: {
+        Args: Record<string, never>
+        Returns: DashboardActivity[]
       }
     }
     Enums: Record<string, never>
