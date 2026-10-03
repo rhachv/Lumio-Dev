@@ -42,6 +42,9 @@ export type ImportRowResult = 'new' | 'possible_duplicate' | 'already_registered
 export type ImportDecision = 'import' | 'update' | 'ignore'
 export type LeadImport = { id: string; user_id: string; file_name: string; file_type: 'csv' | 'xlsx'; file_size: number; total_rows: number; new_rows: number; duplicate_rows: number; updated_rows: number; invalid_rows: number; failed_rows: number; status: ImportStatus; failure_message: string | null; created_at: string; completed_at: string | null }
 export type LeadImportRow = { id: string; user_id: string; import_id: string; row_number: number; raw_data: Json; normalized_data: Json; lead_data: Json; result: ImportRowResult; decision: ImportDecision | null; matched_lead_id: string | null; error_message: string | null; created_at: string }
+export type ScriptCategory = { id: string; user_id: string; name: string; description: string | null; created_at: string; is_active: boolean }
+export type Script = { id: string; user_id: string; title: string; objective: string | null; content: string; category_id: string; niche_id: string | null; is_favorite: boolean; is_archived: boolean; created_at: string; updated_at: string }
+export type ScriptListItem = Script & { category_name: string; category_is_active: boolean; niche_name: string | null }
 
 export type Database = {
   public: {
@@ -88,6 +91,18 @@ export type Database = {
         Update: { id?: string; user_id?: string; import_id?: string; row_number?: number; raw_data?: Json; normalized_data?: Json; lead_data?: Json; result?: ImportRowResult; decision?: ImportDecision | null; matched_lead_id?: string | null; error_message?: string | null; created_at?: string }
         Relationships: [{ foreignKeyName: 'import_rows_import_user_fkey'; columns: ['import_id', 'user_id']; isOneToOne: false; referencedRelation: 'imports'; referencedColumns: ['id', 'user_id'] }, { foreignKeyName: 'import_rows_matched_lead_user_fkey'; columns: ['matched_lead_id', 'user_id']; isOneToOne: false; referencedRelation: 'leads'; referencedColumns: ['id', 'user_id'] }]
       }
+      script_categories: {
+        Row: ScriptCategory
+        Insert: { id?: string; user_id?: string; name: string; description?: string | null; created_at?: string; is_active?: boolean }
+        Update: { id?: string; user_id?: string; name?: string; description?: string | null; created_at?: string; is_active?: boolean }
+        Relationships: []
+      }
+      scripts: {
+        Row: Script
+        Insert: { id?: string; user_id?: string; title: string; objective?: string | null; content: string; category_id: string; niche_id?: string | null; is_favorite?: boolean; is_archived?: boolean; created_at?: string; updated_at?: string }
+        Update: { id?: string; user_id?: string; title?: string; objective?: string | null; content?: string; category_id?: string; niche_id?: string | null; is_favorite?: boolean; is_archived?: boolean; created_at?: string; updated_at?: string }
+        Relationships: [{ foreignKeyName: 'scripts_category_user_fkey'; columns: ['category_id', 'user_id']; isOneToOne: false; referencedRelation: 'script_categories'; referencedColumns: ['id', 'user_id'] }, { foreignKeyName: 'scripts_niche_user_fkey'; columns: ['niche_id', 'user_id']; isOneToOne: false; referencedRelation: 'nichos'; referencedColumns: ['id', 'user_id'] }]
+      }
       profiles: {
         Row: Profile
         Insert: { id: string; name?: string | null; email?: string | null; created_at?: string; updated_at?: string }
@@ -116,6 +131,10 @@ export type Database = {
       delete_lead_import: {
         Args: { p_import_id: string }
         Returns: undefined
+      }
+      search_scripts: {
+        Args: { p_query?: string; p_category_id?: string | null; p_niche_id?: string | null; p_favorites_only?: boolean; p_archived?: 'active' | 'archived' | 'all' }
+        Returns: ScriptListItem[]
       }
     }
     Enums: Record<string, never>

@@ -11,7 +11,7 @@ React, Vite, TypeScript, React Router e Supabase Auth/PostgreSQL. A aplicação 
 1. Instale Node.js 20.19+ ou 22.12+ e npm.
 2. Execute `npm install`.
 3. Copie `.env.example` para `.env.local` e informe a URL do projeto Supabase e a chave publicável (anon/publishable).
-4. Aplique `supabase/migrations/20261002000000_profiles.sql` ao projeto Supabase.
+4. Aplique as migrations em ordem no projeto Supabase, começando por `supabase/migrations/20261002000000_profiles.sql` e seguindo os nomes cronológicos.
 5. Crie o primeiro usuário pelo painel do Supabase; cadastro público não está habilitado na aplicação.
 6. Execute `npm run dev`.
 
@@ -25,7 +25,7 @@ As rotas da aplicação usam o fallback de SPA da Vercel. A configuração atual
 
 ## Escopo atual
 
-Inclui login, sessão, proteção de rotas, layout responsivo, dashboard e páginas de navegação preparadas. Clientes, propostas, scripts e biblioteca ainda aguardam os respectivos blocos.
+Inclui login, sessão, proteção de rotas, layout responsivo, dashboard, CRM de leads, importação de listas e scripts pessoais. Clientes, propostas e biblioteca ainda aguardam os respectivos blocos.
 
 ## Bloco 2 — CRM / Leads
 
@@ -42,3 +42,11 @@ A rota `/importacao` aceita `.xlsx` e `.csv` de até 5 MB e 2.000 linhas. O arqu
 O histórico guarda somente as colunas mapeadas e os valores normalizados necessários à comparação. Os detalhes permanecem até a exclusão explícita do histórico na interface; os leads já importados não são removidos por essa exclusão. A confirmação processa as linhas em uma transação no Postgres, registra falhas por linha e conclui com `completed_with_errors` quando necessário.
 
 Execute `pnpm test` para os testes locais de leitura, mapeamento, normalização e análise. O teste de integração com Supabase requer um projeto configurado e migrations aplicadas.
+
+## Bloco 4 — Scripts de Prospecção
+
+Aplique também `supabase/migrations/20261002030000_prospecting_scripts.sql` depois das migrations anteriores. Ela cria `script_categories` e `scripts`, com referências por usuário, índices, políticas RLS e categorias iniciais sem duplicação. Categorias podem ser inativadas e reativadas; scripts vinculados continuam preservados.
+
+A rota `/scripts` oferece busca por título, objetivo e conteúdo; filtros combináveis por categoria, nicho, favoritos e arquivamento; e ordenação por atualização, data mais antiga ou título. Scripts podem ser criados, editados, consultados, copiados, favoritados, arquivados e restaurados. Marcadores entre colchetes, como `[NOME]`, `[EMPRESA]`, `[NICHO]` e `[CIDADE]`, são destacados visualmente. O Lumio apenas guarda e copia os roteiros; não envia mensagens.
+
+Execute `pnpm test` para validar os módulos locais. Testes de autenticação e RLS precisam de um projeto Supabase configurado com as migrations aplicadas.

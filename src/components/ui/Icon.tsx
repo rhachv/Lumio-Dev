@@ -16,6 +16,10 @@ const paths: Record<string, ReactNode> = {
   menu: <><path d="M4 6h16M4 12h16M4 18h16"/></>,
   close: <><path d="m18 6-12 12M6 6l12 12"/></>,
   chevron: <path d="m9 18 6-6-6-6"/>,
+  star: <><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></>,
+  copy: <><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></>,
+  archive: <><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8m-8 4h2"/></>,
+  restore: <><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5m4-1v5l3 2"/></>,
 }
 
 export type IconName = keyof typeof paths

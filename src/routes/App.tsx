@@ -10,6 +10,8 @@ import { LeadFormPage } from '../pages/Leads/LeadFormPage'
 import { LeadDetailPage } from '../pages/Leads/LeadDetailPage'
 import { ImportPage } from '../pages/Imports/ImportPage'
 import { ImportDetailPage } from '../pages/Imports/ImportDetailPage'
+import { ScriptListPage } from '../pages/Scripts/ScriptListPage'
+import { ScriptEntryPage } from '../pages/Scripts/ScriptEntryPage'
 
 function ProtectedRoute() {
   const { user, loading, configured } = useAuth()
@@ -29,7 +31,7 @@ export function App() {
       <Route path="/leads" element={<LeadListPage />} /><Route path="/leads/novo" element={<LeadFormPage />} /><Route path="/leads/:id/editar" element={<LeadFormPage />} /><Route path="/leads/:id" element={<LeadDetailPage />} />
       <Route path="/clientes" element={<PlaceholderPage />} /><Route path="/clientes/:id" element={<PlaceholderPage />} />
       <Route path="/propostas" element={<PlaceholderPage />} /><Route path="/propostas/nova" element={<PlaceholderPage />} /><Route path="/propostas/:id" element={<PlaceholderPage />} />
-      <Route path="/scripts" element={<PlaceholderPage />} /><Route path="/scripts/novo" element={<PlaceholderPage />} /><Route path="/scripts/:id" element={<PlaceholderPage />} />
+      <Route path="/scripts" element={<ScriptListPage />} /><Route path="/scripts/novo" element={<ScriptEntryPage />} /><Route path="/scripts/:id" element={<ScriptEntryPage />} />
       <Route path="/biblioteca" element={<PlaceholderPage />} /><Route path="/biblioteca/novo" element={<PlaceholderPage />} /><Route path="/biblioteca/:id" element={<PlaceholderPage />} />
       <Route path="/importacao" element={<ImportPage />} /><Route path="/importacao/:id" element={<ImportDetailPage />} /><Route path="/configuracoes" element={<PlaceholderPage />} />
       <Route path="*" element={<PlaceholderPage />} />
