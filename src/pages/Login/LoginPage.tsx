@@ -5,7 +5,7 @@ import { Logo } from '../../components/layout/Logo'
 import { LoadingState } from '../../components/ui/States'
 
 export function LoginPage() {
-  const { user, loading, configured, signIn } = useAuth()
+  const { user, loading, configured, error: authError, signIn } = useAuth()
   const location = useLocation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -25,6 +25,7 @@ export function LoginPage() {
   return <main className="login-page"><section className="login-panel">
     <Logo /><div className="login-copy"><p className="eyebrow">ACESSO PRIVADO</p><h1>Entre na sua conta</h1><p>Use suas credenciais para acessar o Lumio Dev.</p></div>
     <form onSubmit={submit} className="login-form">
+      {authError && <div className="notice notice--error" role="alert">{authError}</div>}
       <label htmlFor="email">E-mail</label><input id="email" type="email" autoComplete="username" required aria-describedby={error ? 'login-error' : undefined} value={email} onChange={(event) => setEmail(event.target.value)} placeholder="voce@exemplo.com" />
       <label htmlFor="password">Senha</label><input id="password" type="password" autoComplete="current-password" required aria-describedby={error ? 'login-error' : undefined} value={password} onChange={(event) => setPassword(event.target.value)} />
       {error && <div id="login-error" className="notice notice--error" role="alert">{error}</div>}

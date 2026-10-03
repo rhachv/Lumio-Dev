@@ -25,7 +25,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(({ data, error: sessionError }) => {
       if (!active) return
       setSession(data.session)
-      setError(sessionError?.message ?? null)
+      setError(sessionError ? 'Não foi possível verificar sua sessão. Confira a conexão e tente novamente.' : null)
+      setLoading(false)
+    }).catch(() => {
+      if (!active) return
+      setSession(null)
+      setError('Não foi possível verificar sua sessão. Confira a conexão e tente novamente.')
       setLoading(false)
     })
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
@@ -44,15 +49,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     error,
     async signIn(email, password) {
       if (!supabase) return 'Configure o Supabase para entrar.'
-      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
-      if (signInError) return 'Não foi possível entrar. Verifique seu e-mail e senha e tente novamente.'
-      return null
+      try {
+        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+        if (signInError) return 'Não foi possível entrar. Verifique seu e-mail e senha e tente novamente.'
+        return null
+      } catch {
+        return 'Não foi possível entrar. Confira sua conexão e tente novamente.'
+      }
     },
     async signOut() {
       if (!supabase) return false
-      const { error: signOutError } = await supabase.auth.signOut()
-      if (signOutError) { setError('Não foi possível encerrar a sessão. Tente novamente.'); return false }
-      return true
+      try {
+        const { error: signOutError } = await supabase.auth.signOut()
+        if (signOutError) { setError('Não foi possível encerrar a sessão. Tente novamente.'); return false }
+        return true
+      } catch {
+        setError('Não foi possível encerrar a sessão. Confira sua conexão e tente novamente.')
+        return false
+      }
     },
   }), [session, loading, error])
 
