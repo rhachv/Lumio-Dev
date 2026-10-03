@@ -19,6 +19,9 @@ import { ClientDetailPage } from '../pages/Clients/ClientDetailPage'
 import { ClientFormPage } from '../pages/Clients/ClientFormPage'
 import { ProjectDetailPage } from '../pages/Projects/ProjectDetailPage'
 import { ProjectFormPage } from '../pages/Projects/ProjectFormPage'
+import { ProposalListPage } from '../pages/Proposals/ProposalListPage'
+import { ProposalDetailPage } from '../pages/Proposals/ProposalDetailPage'
+import { ProposalFormPage } from '../pages/Proposals/ProposalFormPage'
 
 function ProtectedRoute() {
   const { user, loading, configured } = useAuth()
@@ -38,7 +41,7 @@ export function App() {
       <Route path="/leads" element={<LeadListPage />} /><Route path="/leads/novo" element={<LeadFormPage />} /><Route path="/leads/:id/editar" element={<LeadFormPage />} /><Route path="/leads/:id" element={<LeadDetailPage />} />
       <Route path="/clientes" element={<ClientListPage />} /><Route path="/clientes/:id/editar" element={<ClientFormPage />} /><Route path="/clientes/:id" element={<ClientDetailPage />} />
       <Route path="/projetos/novo" element={<ProjectFormPage />} /><Route path="/projetos/:id/editar" element={<ProjectFormPage />} /><Route path="/projetos/:id" element={<ProjectDetailPage />} />
-      <Route path="/propostas" element={<PlaceholderPage />} /><Route path="/propostas/nova" element={<PlaceholderPage />} /><Route path="/propostas/:id" element={<PlaceholderPage />} />
+      <Route path="/propostas" element={<ProposalListPage />} /><Route path="/propostas/nova" element={<ProposalFormPage />} /><Route path="/propostas/:id/editar" element={<ProposalFormPage />} /><Route path="/propostas/:id" element={<ProposalDetailPage />} />
       <Route path="/scripts" element={<ScriptListPage />} /><Route path="/scripts/novo" element={<ScriptEntryPage />} /><Route path="/scripts/:id" element={<ScriptEntryPage />} />
       <Route path="/biblioteca" element={<LibraryListPage />} /><Route path="/biblioteca/novo" element={<LibraryEntryPage />} /><Route path="/biblioteca/:id" element={<LibraryEntryPage />} />
       <Route path="/importacao" element={<ImportPage />} /><Route path="/importacao/:id" element={<ImportDetailPage />} /><Route path="/configuracoes" element={<PlaceholderPage />} />

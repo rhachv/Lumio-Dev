@@ -67,6 +67,17 @@ export type Project = {
   is_archived: boolean; created_at: string; updated_at: string
 }
 export type ProjectStatusHistory = { id: string; user_id: string; project_id: string; previous_status: ProjectStatus | null; new_status: ProjectStatus; changed_at: string }
+export const proposalStatuses = ['draft', 'sent', 'negotiation', 'accepted', 'rejected'] as const
+export type ProposalStatus = (typeof proposalStatuses)[number]
+export type Proposal = {
+  id: string; user_id: string; lead_id: string | null; client_id: string | null; title: string; service: string;
+  description: string | null; value: number | null; status: ProposalStatus; valid_until: string | null;
+  sent_at: string | null; notes: string | null; is_archived: boolean; created_at: string; updated_at: string
+}
+export type ProposalListItem = Proposal & { lead_company_name: string | null; client_company_name: string | null }
+export type ProposalStatusHistory = { id: string; user_id: string; proposal_id: string; previous_status: ProposalStatus | null; new_status: ProposalStatus; changed_at: string }
+export type ProposalSummary = { status: ProposalStatus; proposal_count: number; total_value: number }
+
 export type Database = {
   public: {
     Tables: {
@@ -160,6 +171,18 @@ export type Database = {
         Update: { id?: string; user_id?: string; project_id?: string; previous_status?: ProjectStatus | null; new_status?: ProjectStatus; changed_at?: string }
         Relationships: [{ foreignKeyName: 'project_status_history_project_user_fkey'; columns: ['project_id', 'user_id']; isOneToOne: false; referencedRelation: 'projects'; referencedColumns: ['id', 'user_id'] }]
       }
+      proposals: {
+        Row: Proposal
+        Insert: { id?: string; user_id?: string; lead_id?: string | null; client_id?: string | null; title: string; service: string; description?: string | null; value?: number | null; status?: ProposalStatus; valid_until?: string | null; sent_at?: string | null; notes?: string | null; is_archived?: boolean; created_at?: string; updated_at?: string }
+        Update: { id?: string; user_id?: string; lead_id?: string | null; client_id?: string | null; title?: string; service?: string; description?: string | null; value?: number | null; status?: ProposalStatus; valid_until?: string | null; sent_at?: string | null; notes?: string | null; is_archived?: boolean; created_at?: string; updated_at?: string }
+        Relationships: [{ foreignKeyName: 'proposals_lead_user_fkey'; columns: ['lead_id', 'user_id']; isOneToOne: false; referencedRelation: 'leads'; referencedColumns: ['id', 'user_id'] }, { foreignKeyName: 'proposals_client_user_fkey'; columns: ['client_id', 'user_id']; isOneToOne: false; referencedRelation: 'clients'; referencedColumns: ['id', 'user_id'] }]
+      }
+      proposal_status_history: {
+        Row: ProposalStatusHistory
+        Insert: { id?: string; user_id?: string; proposal_id: string; previous_status?: ProposalStatus | null; new_status: ProposalStatus; changed_at?: string }
+        Update: { id?: string; user_id?: string; proposal_id?: string; previous_status?: ProposalStatus | null; new_status?: ProposalStatus; changed_at?: string }
+        Relationships: [{ foreignKeyName: 'proposal_status_history_proposal_user_fkey'; columns: ['proposal_id', 'user_id']; isOneToOne: false; referencedRelation: 'proposals'; referencedColumns: ['id', 'user_id'] }]
+      }
       profiles: {
         Row: Profile
         Insert: { id: string; name?: string | null; email?: string | null; created_at?: string; updated_at?: string }
@@ -208,6 +231,14 @@ export type Database = {
       search_clients: {
         Args: { p_query?: string; p_archived?: 'active' | 'archived' | 'all'; p_project_filter?: 'all' | 'with_projects' | 'without_projects' | 'in_progress' | 'completed' }
         Returns: ClientListItem[]
+      }
+      search_proposals: {
+        Args: { p_query?: string; p_status?: ProposalStatus | null; p_client_id?: string | null; p_lead_id?: string | null; p_from?: string | null; p_to?: string | null; p_archived?: 'active' | 'archived' | 'all' }
+        Returns: ProposalListItem[]
+      }
+      proposal_summary: {
+        Args: Record<string, never>
+        Returns: ProposalSummary[]
       }
     }
     Enums: Record<string, never>
