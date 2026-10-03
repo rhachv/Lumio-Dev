@@ -25,7 +25,7 @@ As rotas da aplicação usam o fallback de SPA da Vercel. A configuração atual
 
 ## Escopo atual
 
-Inclui login, sessão, proteção de rotas, layout responsivo, dashboard, CRM de leads, importação de listas e scripts pessoais. Clientes, propostas e biblioteca ainda aguardam os respectivos blocos.
+Inclui login, sessão, proteção de rotas, layout responsivo, dashboard, CRM de leads, importação, scripts de prospecção e biblioteca pessoal. Clientes, propostas e projetos ainda aguardam os respectivos blocos.
 
 ## Bloco 2 — CRM / Leads
 
@@ -50,3 +50,13 @@ Aplique também `supabase/migrations/20261002030000_prospecting_scripts.sql` dep
 A rota `/scripts` oferece busca por título, objetivo e conteúdo; filtros combináveis por categoria, nicho, favoritos e arquivamento; e ordenação por atualização, data mais antiga ou título. Scripts podem ser criados, editados, consultados, copiados, favoritados, arquivados e restaurados. Marcadores entre colchetes, como `[NOME]`, `[EMPRESA]`, `[NICHO]` e `[CIDADE]`, são destacados visualmente. O Lumio apenas guarda e copia os roteiros; não envia mensagens.
 
 Execute `pnpm test` para validar os módulos locais. Testes de autenticação e RLS precisam de um projeto Supabase configurado com as migrations aplicadas.
+
+## Bloco 5 — Biblioteca / Swipe File
+
+Aplique `supabase/migrations/20261002040000_library_swipe_file.sql` depois das migrations anteriores. Ela cria `library_items`, `tags` e `library_item_tags` com relacionamento muitos-para-muitos, políticas RLS por usuário e a RPC de busca paginada. As tags podem ser inativadas e reativadas sem remover vínculos existentes; nomes parecidos não são unidos automaticamente.
+
+As rotas `/biblioteca`, `/biblioteca/novo` e `/biblioteca/:id` oferecem busca por título, descrição, notas e tags; filtros combináveis por tipo, todas as tags selecionadas, favoritos e arquivamento; ordenação e paginação. URLs aceitam somente HTTP/HTTPS e abrem em uma nova aba.
+
+Screenshots PNG, JPG e WEBP podem ter até 10 MB. O navegador verifica o tipo e a assinatura do arquivo e redimensiona imagens acima de 1.600 px. Os arquivos ficam no bucket privado `lumio-library-screenshots`, sob um caminho associado ao usuário e à referência; a interface usa URLs assinadas temporárias. A substituição atualiza o vínculo no banco e tenta remover o objeto anterior.
+
+Os testes locais cobrem validação de URL, tipos e assinatura de imagem, nomes de tags e validações do formulário. CRUD com Supabase, RLS e Storage precisa de um projeto configurado e migrations aplicadas para ser exercitado de ponta a ponta.

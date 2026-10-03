@@ -45,6 +45,12 @@ export type LeadImportRow = { id: string; user_id: string; import_id: string; ro
 export type ScriptCategory = { id: string; user_id: string; name: string; description: string | null; created_at: string; is_active: boolean }
 export type Script = { id: string; user_id: string; title: string; objective: string | null; content: string; category_id: string; niche_id: string | null; is_favorite: boolean; is_archived: boolean; created_at: string; updated_at: string }
 export type ScriptListItem = Script & { category_name: string; category_is_active: boolean; niche_name: string | null }
+export const libraryItemTypes = ['site', 'landing_page', 'design', 'copy', 'offer', 'idea', 'prompt', 'sales', 'other'] as const
+export type LibraryItemType = (typeof libraryItemTypes)[number]
+export type LibraryItem = { id: string; user_id: string; title: string; description: string | null; type: LibraryItemType; url: string | null; notes: string | null; screenshot_path: string | null; is_favorite: boolean; is_archived: boolean; created_at: string; updated_at: string }
+export type Tag = { id: string; user_id: string; name: string; is_active: boolean; created_at: string }
+export type LibraryItemTag = { user_id: string; library_item_id: string; tag_id: string; created_at: string }
+export type LibrarySearchResult = LibraryItem & { tags: Array<Pick<Tag, 'id' | 'name' | 'is_active'>> }
 
 export type Database = {
   public: {
@@ -103,6 +109,24 @@ export type Database = {
         Update: { id?: string; user_id?: string; title?: string; objective?: string | null; content?: string; category_id?: string; niche_id?: string | null; is_favorite?: boolean; is_archived?: boolean; created_at?: string; updated_at?: string }
         Relationships: [{ foreignKeyName: 'scripts_category_user_fkey'; columns: ['category_id', 'user_id']; isOneToOne: false; referencedRelation: 'script_categories'; referencedColumns: ['id', 'user_id'] }, { foreignKeyName: 'scripts_niche_user_fkey'; columns: ['niche_id', 'user_id']; isOneToOne: false; referencedRelation: 'nichos'; referencedColumns: ['id', 'user_id'] }]
       }
+      library_items: {
+        Row: LibraryItem
+        Insert: { id?: string; user_id?: string; title: string; description?: string | null; type: LibraryItemType; url?: string | null; notes?: string | null; screenshot_path?: string | null; is_favorite?: boolean; is_archived?: boolean; created_at?: string; updated_at?: string }
+        Update: { id?: string; user_id?: string; title?: string; description?: string | null; type?: LibraryItemType; url?: string | null; notes?: string | null; screenshot_path?: string | null; is_favorite?: boolean; is_archived?: boolean; created_at?: string; updated_at?: string }
+        Relationships: []
+      }
+      tags: {
+        Row: Tag
+        Insert: { id?: string; user_id?: string; name: string; is_active?: boolean; created_at?: string }
+        Update: { id?: string; user_id?: string; name?: string; is_active?: boolean; created_at?: string }
+        Relationships: []
+      }
+      library_item_tags: {
+        Row: LibraryItemTag
+        Insert: { user_id?: string; library_item_id: string; tag_id: string; created_at?: string }
+        Update: { user_id?: string; library_item_id?: string; tag_id?: string; created_at?: string }
+        Relationships: [{ foreignKeyName: 'library_item_tags_item_user_fkey'; columns: ['library_item_id', 'user_id']; isOneToOne: false; referencedRelation: 'library_items'; referencedColumns: ['id', 'user_id'] }, { foreignKeyName: 'library_item_tags_tag_user_fkey'; columns: ['tag_id', 'user_id']; isOneToOne: false; referencedRelation: 'tags'; referencedColumns: ['id', 'user_id'] }]
+      }
       profiles: {
         Row: Profile
         Insert: { id: string; name?: string | null; email?: string | null; created_at?: string; updated_at?: string }
@@ -135,6 +159,14 @@ export type Database = {
       search_scripts: {
         Args: { p_query?: string; p_category_id?: string | null; p_niche_id?: string | null; p_favorites_only?: boolean; p_archived?: 'active' | 'archived' | 'all' }
         Returns: ScriptListItem[]
+      }
+      search_library_items: {
+        Args: { p_query?: string; p_type?: string | null; p_tag_ids?: string[]; p_favorites_only?: boolean; p_archived?: 'active' | 'archived' | 'all'; p_sort?: 'recent' | 'oldest' | 'title'; p_item_id?: string | null; p_page?: number; p_page_size?: number }
+        Returns: Array<LibraryItem & { tags: Json; total_count: number }>
+      }
+      save_library_item: {
+        Args: { p_item_id: string; p_title: string; p_description: string | null; p_type: LibraryItemType; p_url: string | null; p_notes: string | null; p_is_favorite: boolean; p_tag_ids: string[]; p_screenshot_path: string | null }
+        Returns: string
       }
     }
     Enums: Record<string, never>
