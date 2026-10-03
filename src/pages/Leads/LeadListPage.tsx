@@ -96,7 +96,7 @@ export function LeadListPage() {
           <table className="lead-table"><thead><tr><th>Empresa</th><th>Responsável</th><th>Nicho</th><th>Cidade</th><th>WhatsApp</th><th>Status</th><th>Origem</th><th>Prospecção</th><th>Atualizado</th><th><span className="sr-only">Ações</span></th></tr></thead><tbody>
             {rows.map((lead) => <tr key={lead.id}>
               <td><Link className="lead-company-link" to={`/leads/${lead.id}`}>{lead.company_name}</Link>{lead.is_archived && <span className="archive-label table-archive-label">Arquivado</span>}</td><td>{lead.responsible_name || '—'}</td><td>{lead.niche_name || '—'}</td><td>{[lead.city, lead.state].filter(Boolean).join(' / ') || '—'}</td>
-              <td>{lead.whatsapp ? <a className="lead-contact-link" href={toWhatsAppUrl(lead.whatsapp) ?? undefined} target="_blank" rel="noreferrer">{lead.whatsapp}</a> : '—'}</td><td><LeadStatusBadge status={lead.status} /></td><td>{sourceLabels[lead.source]}</td>
+              <td>{lead.whatsapp ? <a className="lead-contact-link" href={toWhatsAppUrl(lead.whatsapp) ?? undefined} target="_blank" rel="noreferrer">{lead.whatsapp}</a> : '—'}</td><td><LeadStatusBadge status={lead.status} /></td><td>{lead.source_detail || sourceLabels[lead.source]}</td>
               <td>{lead.is_blocked ? <span className="blocked-label">Bloqueado</span> : 'Disponível'}</td><td>{formatDate(lead.updated_at)}</td><td><Link className="icon-button lead-open" to={`/leads/${lead.id}`} aria-label={`Abrir ${lead.company_name}`}><Icon name="arrow" /></Link></td>
             </tr>)}
           </tbody></table>
@@ -112,7 +112,7 @@ function LeadMobileCard({ lead }: { lead: LeadListRow }) {
   const whatsappUrl = toWhatsAppUrl(lead.whatsapp)
   return <article className="lead-mobile-card">
     <div className="lead-mobile-top"><div><Link className="lead-company-link" to={`/leads/${lead.id}`}>{lead.company_name}</Link>{lead.is_archived && <span className="archive-label mobile-archive-label">Arquivado</span>}<p>{lead.responsible_name || lead.niche_name || 'Sem responsável informado'}</p></div><LeadStatusBadge status={lead.status} /></div>
-    <dl><div><dt>Cidade</dt><dd>{[lead.city, lead.state].filter(Boolean).join(' / ') || '—'}</dd></div><div><dt>Origem</dt><dd>{sourceLabels[lead.source]}</dd></div>{lead.whatsapp && <div><dt>WhatsApp</dt><dd>{lead.whatsapp}</dd></div>}</dl>
+    <dl><div><dt>Cidade</dt><dd>{[lead.city, lead.state].filter(Boolean).join(' / ') || '—'}</dd></div><div><dt>Origem</dt><dd>{lead.source_detail || sourceLabels[lead.source]}</dd></div>{lead.whatsapp && <div><dt>WhatsApp</dt><dd>{lead.whatsapp}</dd></div>}</dl>
     <div className="lead-mobile-actions"><span className={lead.is_blocked ? 'blocked-label' : 'available-label'}>{lead.is_blocked ? 'Bloqueado' : 'Disponível'}</span>{whatsappUrl && <a className="text-link" href={whatsappUrl} target="_blank" rel="noreferrer">Abrir WhatsApp <Icon name="arrow" /></a>}<Link className="text-link" to={`/leads/${lead.id}`}>Detalhes <Icon name="chevron" /></Link></div>
   </article>
 }

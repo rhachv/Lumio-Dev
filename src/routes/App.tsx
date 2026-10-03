@@ -8,6 +8,8 @@ import { PlaceholderPage } from '../pages/PlaceholderPage'
 import { LeadListPage } from '../pages/Leads/LeadListPage'
 import { LeadFormPage } from '../pages/Leads/LeadFormPage'
 import { LeadDetailPage } from '../pages/Leads/LeadDetailPage'
+import { ImportPage } from '../pages/Imports/ImportPage'
+import { ImportDetailPage } from '../pages/Imports/ImportDetailPage'
 
 function ProtectedRoute() {
   const { user, loading, configured } = useAuth()
@@ -29,7 +31,7 @@ export function App() {
       <Route path="/propostas" element={<PlaceholderPage />} /><Route path="/propostas/nova" element={<PlaceholderPage />} /><Route path="/propostas/:id" element={<PlaceholderPage />} />
       <Route path="/scripts" element={<PlaceholderPage />} /><Route path="/scripts/novo" element={<PlaceholderPage />} /><Route path="/scripts/:id" element={<PlaceholderPage />} />
       <Route path="/biblioteca" element={<PlaceholderPage />} /><Route path="/biblioteca/novo" element={<PlaceholderPage />} /><Route path="/biblioteca/:id" element={<PlaceholderPage />} />
-      <Route path="/importacao" element={<PlaceholderPage />} /><Route path="/configuracoes" element={<PlaceholderPage />} />
+      <Route path="/importacao" element={<ImportPage />} /><Route path="/importacao/:id" element={<ImportDetailPage />} /><Route path="/configuracoes" element={<PlaceholderPage />} />
       <Route path="*" element={<PlaceholderPage />} />
     </Route></Route>
     <Route path="*" element={<Navigate to={user ? '/dashboard' : '/login'} replace />} />

@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabase/client'
 import type { InteractionType, Lead, LeadActivity, LeadInteraction, LeadSource, LeadStatus, LeadStatusHistory, LeadWithNiche, Niche } from '../types/database'
 
-export type LeadInput = Pick<Lead, 'company_name' | 'source'> & Partial<Pick<Lead, 'responsible_name' | 'niche_id' | 'city' | 'state' | 'whatsapp' | 'instagram' | 'notes'>>
+export type LeadInput = Pick<Lead, 'company_name' | 'source'> & Partial<Pick<Lead, 'responsible_name' | 'niche_id' | 'city' | 'state' | 'whatsapp' | 'instagram' | 'source_detail' | 'notes'>>
 export type LeadFilters = { query: string; status: LeadStatus | null; nicheId: string | null; source: LeadSource | null; blocked: boolean | null; archived: 'active' | 'archived' | 'all'; page: number; pageSize: number }
 export type LeadListRow = Lead & { niche_name: string | null }
 export type DuplicateLead = { id: string; company_name: string; niche_name: string | null; city: string | null; whatsapp: string | null; status: LeadStatus; matched_on: 'whatsapp' | 'instagram' | 'company_city' }

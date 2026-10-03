@@ -25,10 +25,20 @@ As rotas da aplicação usam o fallback de SPA da Vercel. A configuração atual
 
 ## Escopo atual
 
-Inclui login, sessão, proteção de rotas, layout responsivo, dashboard vazio e páginas de navegação preparadas. Leads, clientes, propostas, scripts, biblioteca e importação ainda não têm funcionalidades de negócio.
+Inclui login, sessão, proteção de rotas, layout responsivo, dashboard e páginas de navegação preparadas. Clientes, propostas, scripts e biblioteca ainda aguardam os respectivos blocos.
 
 ## Bloco 2 — CRM / Leads
 
 A migration do Bloco 2 cria `leads`, `nichos`, `lead_interactions`, `lead_status_history` e `lead_activity_history`, com RLS por `auth.uid()`, índices para paginação/filtros, detecção de duplicidade no Postgres e eventos de auditoria gravados por triggers. Aplique as migrations em ordem (`20261002000000_profiles.sql` e depois `20261002010000_leads_crm.sql`) no projeto Supabase antes de testar o CRM.
 
 A lista usa páginas de 25 registros e os filtros ficam na URL. Leads bloqueados ficam fora da visualização ativa padrão; arquivamento permanece separado do bloqueio. O CRM não apaga registros e não cria follow-ups.
+
+## Bloco 3 — Importação Excel / CSV
+
+Aplique as migrations em ordem: `20261002000000_profiles.sql`, `20261002010000_leads_crm.sql` e `20261002020000_lead_imports.sql`. A última migration cria `imports` e `import_rows`, ativa RLS por usuário, preserva a origem informada em `leads.source_detail` e prepara as RPCs de análise e confirmação.
+
+A rota `/importacao` aceita `.xlsx` e `.csv` de até 5 MB e 2.000 linhas. O arquivo é lido no navegador com SheetJS; fórmulas em arquivos Excel são rejeitadas e o arquivo original não é enviado ao servidor. A análise compara WhatsApp, Instagram e empresa/cidade, inclui conflitos e duplicidades do próprio arquivo, e exige confirmação antes de persistir leads. Leads novos começam com status `new`, sem bloqueio ou arquivamento.
+
+O histórico guarda somente as colunas mapeadas e os valores normalizados necessários à comparação. Os detalhes permanecem até a exclusão explícita do histórico na interface; os leads já importados não são removidos por essa exclusão. A confirmação processa as linhas em uma transação no Postgres, registra falhas por linha e conclui com `completed_with_errors` quando necessário.
+
+Execute `pnpm test` para os testes locais de leitura, mapeamento, normalização e análise. O teste de integração com Supabase requer um projeto configurado e migrations aplicadas.

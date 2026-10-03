@@ -9,13 +9,13 @@ import { readableError, sourceOptions } from '../../components/leads/leadMeta'
 import { createLead, getLead, getLeadNiches, updateLead, type DuplicateLead, type LeadInput } from '../../services/leads'
 import type { Niche } from '../../types/database'
 
-type FormValues = { company_name: string; responsible_name: string; niche_id: string; city: string; state: string; whatsapp: string; instagram: string; source: string; notes: string }
-const emptyValues: FormValues = { company_name: '', responsible_name: '', niche_id: '', city: '', state: '', whatsapp: '', instagram: '', source: 'manual', notes: '' }
+type FormValues = { company_name: string; responsible_name: string; niche_id: string; city: string; state: string; whatsapp: string; instagram: string; source: string; source_detail: string; notes: string }
+const emptyValues: FormValues = { company_name: '', responsible_name: '', niche_id: '', city: '', state: '', whatsapp: '', instagram: '', source: 'manual', source_detail: '', notes: '' }
 
 function toLeadInput(values: FormValues): LeadInput {
   const clean = (value: string) => value.trim() || null
   return {
-    company_name: values.company_name.trim(), source: values.source as LeadInput['source'],
+    company_name: values.company_name.trim(), source: values.source as LeadInput['source'], source_detail: clean(values.source_detail),
     responsible_name: clean(values.responsible_name), niche_id: values.niche_id || null,
     city: clean(values.city), state: clean(values.state), whatsapp: clean(values.whatsapp),
     instagram: clean(values.instagram), notes: clean(values.notes),
@@ -45,7 +45,7 @@ export function LeadFormPage() {
     getLeadNiches().then((result) => { if (active) setNiches(result) }).catch(() => { if (active) setNicheError(true) })
     if (id) getLead(id).then((lead) => {
       if (!active) return
-      setValues({ company_name: lead.company_name, responsible_name: lead.responsible_name ?? '', niche_id: lead.niche_id ?? '', city: lead.city ?? '', state: lead.state ?? '', whatsapp: lead.whatsapp ?? '', instagram: lead.instagram ?? '', source: lead.source, notes: lead.notes ?? '' })
+      setValues({ company_name: lead.company_name, responsible_name: lead.responsible_name ?? '', niche_id: lead.niche_id ?? '', city: lead.city ?? '', state: lead.state ?? '', whatsapp: lead.whatsapp ?? '', instagram: lead.instagram ?? '', source: lead.source, source_detail: lead.source_detail ?? '', notes: lead.notes ?? '' })
     }).catch(() => { if (active) setError('Não foi possível carregar este lead.') }).finally(() => { if (active) setLoading(false) })
     return () => { active = false }
   }, [id, nicheRetry])
@@ -89,6 +89,7 @@ export function LeadFormPage() {
         <div className="form-grid form-grid--two"><Input id="whatsapp" label="WhatsApp" type="tel" autoComplete="tel" maxLength={40} hint="Pode incluir o código do país. Números locais recebem +55 ao abrir o WhatsApp." value={values.whatsapp} onChange={(event) => setField('whatsapp', event.target.value)} placeholder="(11) 99999-9999" />
           <Input id="instagram" label="Instagram" maxLength={160} hint="Nome de usuário ou link do perfil." value={values.instagram} onChange={(event) => setField('instagram', event.target.value)} placeholder="@perfil" />
           <Select id="source" label="Origem *" required value={values.source} onChange={(event) => setField('source', event.target.value)}>{sourceOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</Select>
+          <Input id="source-detail" label="Detalhe da origem" maxLength={120} hint="Preserva o nome específico recebido de uma lista ou indicação." value={values.source_detail} onChange={(event) => setField('source_detail', event.target.value)} />
         </div>
       </section>
       <section className="form-section"><div className="form-section-heading"><h2>Observações</h2><p>Registre contexto útil para este relacionamento.</p></div><Textarea id="notes" label="Observações" maxLength={4000} rows={5} value={values.notes} onChange={(event) => setField('notes', event.target.value)} /></section>

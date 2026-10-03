@@ -81,7 +81,7 @@ export function LeadDetailPage() {
       <section className="dashboard-section lead-info-section"><div className="section-heading"><div><h2>Informações do lead</h2><p>Dados de contato e origem</p></div></div><dl className="lead-info-grid">
         <Info label="Responsável" value={lead.responsible_name} /><Info label="Nicho" value={lead.niche?.name} /><Info label="Cidade" value={lead.city} /><Info label="Estado" value={lead.state} />
         <Info label="WhatsApp" value={lead.whatsapp} href={whatsappUrl} /><Info label="Instagram" value={lead.instagram} href={toInstagramUrl(lead.instagram)} external />
-        <Info label="Origem" value={sourceLabels[lead.source]} /><Info label="Criado em" value={formatDate(lead.created_at, true)} /><Info label="Atualizado em" value={formatDate(lead.updated_at, true)} />
+        <Info label="Origem" value={lead.source_detail || sourceLabels[lead.source]} /><Info label="Criado em" value={formatDate(lead.created_at, true)} /><Info label="Atualizado em" value={formatDate(lead.updated_at, true)} />
         <div className="lead-info-item lead-info-item--wide"><dt>Observações</dt><dd className="lead-notes">{lead.notes || 'Nenhuma observação registrada.'}</dd></div>
         {lead.is_blocked && lead.block_reason && <div className="lead-info-item lead-info-item--wide"><dt>Motivo do bloqueio</dt><dd>{lead.block_reason}</dd></div>}
       </dl></section>
