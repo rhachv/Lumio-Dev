@@ -52,6 +52,21 @@ export type Tag = { id: string; user_id: string; name: string; is_active: boolea
 export type LibraryItemTag = { user_id: string; library_item_id: string; tag_id: string; created_at: string }
 export type LibrarySearchResult = LibraryItem & { tags: Array<Pick<Tag, 'id' | 'name' | 'is_active'>> }
 
+export const projectStatuses = ['briefing', 'design', 'development', 'review', 'delivery', 'completed', 'cancelled'] as const
+export type ProjectStatus = (typeof projectStatuses)[number]
+export type Client = {
+  id: string; user_id: string; lead_id: string; company_name: string; responsible_name: string | null;
+  niche_name: string | null; city: string | null; state: string | null; whatsapp: string | null;
+  instagram: string | null; notes: string | null; is_archived: boolean; created_at: string; updated_at: string
+}
+export type ClientListItem = Client & { project_count: number; project_total_value: number }
+export type Project = {
+  id: string; user_id: string; client_id: string; name: string; service: string; value: number | null;
+  status: ProjectStatus; start_date: string | null; deadline: string | null; project_url: string | null;
+  github_url: string | null; vercel_url: string | null; domain: string | null; notes: string | null;
+  is_archived: boolean; created_at: string; updated_at: string
+}
+export type ProjectStatusHistory = { id: string; user_id: string; project_id: string; previous_status: ProjectStatus | null; new_status: ProjectStatus; changed_at: string }
 export type Database = {
   public: {
     Tables: {
@@ -127,6 +142,24 @@ export type Database = {
         Update: { user_id?: string; library_item_id?: string; tag_id?: string; created_at?: string }
         Relationships: [{ foreignKeyName: 'library_item_tags_item_user_fkey'; columns: ['library_item_id', 'user_id']; isOneToOne: false; referencedRelation: 'library_items'; referencedColumns: ['id', 'user_id'] }, { foreignKeyName: 'library_item_tags_tag_user_fkey'; columns: ['tag_id', 'user_id']; isOneToOne: false; referencedRelation: 'tags'; referencedColumns: ['id', 'user_id'] }]
       }
+      clients: {
+        Row: Client
+        Insert: { id?: string; user_id?: string; lead_id: string; company_name: string; responsible_name?: string | null; niche_name?: string | null; city?: string | null; state?: string | null; whatsapp?: string | null; instagram?: string | null; notes?: string | null; is_archived?: boolean; created_at?: string; updated_at?: string }
+        Update: { id?: string; user_id?: string; lead_id?: string; company_name?: string; responsible_name?: string | null; niche_name?: string | null; city?: string | null; state?: string | null; whatsapp?: string | null; instagram?: string | null; notes?: string | null; is_archived?: boolean; created_at?: string; updated_at?: string }
+        Relationships: [{ foreignKeyName: 'clients_lead_user_fkey'; columns: ['lead_id', 'user_id']; isOneToOne: true; referencedRelation: 'leads'; referencedColumns: ['id', 'user_id'] }]
+      }
+      projects: {
+        Row: Project
+        Insert: { id?: string; user_id?: string; client_id: string; name: string; service: string; value?: number | null; status?: ProjectStatus; start_date?: string | null; deadline?: string | null; project_url?: string | null; github_url?: string | null; vercel_url?: string | null; domain?: string | null; notes?: string | null; is_archived?: boolean; created_at?: string; updated_at?: string }
+        Update: { id?: string; user_id?: string; client_id?: string; name?: string; service?: string; value?: number | null; status?: ProjectStatus; start_date?: string | null; deadline?: string | null; project_url?: string | null; github_url?: string | null; vercel_url?: string | null; domain?: string | null; notes?: string | null; is_archived?: boolean; created_at?: string; updated_at?: string }
+        Relationships: [{ foreignKeyName: 'projects_client_user_fkey'; columns: ['client_id', 'user_id']; isOneToOne: false; referencedRelation: 'clients'; referencedColumns: ['id', 'user_id'] }]
+      }
+      project_status_history: {
+        Row: ProjectStatusHistory
+        Insert: { id?: string; user_id?: string; project_id: string; previous_status?: ProjectStatus | null; new_status: ProjectStatus; changed_at?: string }
+        Update: { id?: string; user_id?: string; project_id?: string; previous_status?: ProjectStatus | null; new_status?: ProjectStatus; changed_at?: string }
+        Relationships: [{ foreignKeyName: 'project_status_history_project_user_fkey'; columns: ['project_id', 'user_id']; isOneToOne: false; referencedRelation: 'projects'; referencedColumns: ['id', 'user_id'] }]
+      }
       profiles: {
         Row: Profile
         Insert: { id: string; name?: string | null; email?: string | null; created_at?: string; updated_at?: string }
@@ -167,6 +200,14 @@ export type Database = {
       save_library_item: {
         Args: { p_item_id: string; p_title: string; p_description: string | null; p_type: LibraryItemType; p_url: string | null; p_notes: string | null; p_is_favorite: boolean; p_tag_ids: string[]; p_screenshot_path: string | null }
         Returns: string
+      }
+      convert_won_lead_to_client: {
+        Args: { p_lead_id: string }
+        Returns: string
+      }
+      search_clients: {
+        Args: { p_query?: string; p_archived?: 'active' | 'archived' | 'all'; p_project_filter?: 'all' | 'with_projects' | 'without_projects' | 'in_progress' | 'completed' }
+        Returns: ClientListItem[]
       }
     }
     Enums: Record<string, never>

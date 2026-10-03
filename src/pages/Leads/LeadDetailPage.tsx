@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { Button, Input, Select, Textarea } from '../../components/ui/FormControls'
 import { Icon } from '../../components/ui/Icon'
 import { ConfirmDialog, Dialog } from '../../components/ui/Overlays'
 import { LeadStatusBadge } from '../../components/leads/LeadStatusBadge'
 import { formatDate, interactionLabels, readableError, sourceLabels, statusOptions, toInstagramUrl, toWhatsAppUrl } from '../../components/leads/leadMeta'
 import { addLeadInteraction, changeLeadStatus, getLead, getLeadTimeline, setLeadArchived, setLeadBlocked, type TimelineEntry } from '../../services/leads'
+import { convertWonLeadToClient, getClientForLead } from '../../services/clients'
 import { ErrorState, LoadingState } from '../../components/ui/States'
 import type { InteractionType, LeadWithNiche } from '../../types/database'
 
@@ -14,6 +15,7 @@ function localDateTimeNow() { const now = new Date(); return new Date(now.getTim
 
 export function LeadDetailPage() {
   const { id = '' } = useParams()
+  const navigate = useNavigate()
   const location = useLocation()
   const [lead, setLead] = useState<LeadWithNiche | null>(null)
   const [timeline, setTimeline] = useState<TimelineEntry[]>([])
@@ -29,12 +31,14 @@ export function LeadDetailPage() {
   const [saving, setSaving] = useState(false)
   const [notice, setNotice] = useState((location.state as { notice?: string } | null)?.notice ?? null)
   const [showFullTimeline, setShowFullTimeline] = useState(false)
+  const [clientId, setClientId] = useState<string | null>(null)
+  const [converting, setConverting] = useState(false)
 
   const load = useCallback(async (isRefresh = false, isActive: () => boolean = () => true) => {
     if (isActive()) { isRefresh ? setRefreshing(true) : setLoading(true); setError(null) }
     try {
-      const [record, history] = await Promise.all([getLead(id), getLeadTimeline(id)])
-      if (isActive()) { setLead(record); setTimeline(history) }
+      const [record, history, client] = await Promise.all([getLead(id), getLeadTimeline(id), getClientForLead(id)])
+      if (isActive()) { setLead(record); setTimeline(history); setClientId(client?.id ?? null) }
     } catch { if (isActive()) setError('Não foi possível carregar este lead. Tente novamente.') }
     finally { if (isActive()) { setLoading(false); setRefreshing(false) } }
   }, [id])
@@ -64,6 +68,13 @@ export function LeadDetailPage() {
     if (saved) { setInteractionNote(''); setOccurredAt(localDateTimeNow()) }
   }
 
+  async function convertLead() {
+    setConverting(true); setError(null)
+    try { const client = await convertWonLeadToClient(id); navigate(`/clientes/${client.id}`, { state: { notice: 'Lead convertido em cliente.' } }) }
+    catch { setError('Não foi possível converter este lead. Confirme se o status está como Ganho e tente novamente.') }
+    finally { setConverting(false) }
+  }
+
   const visibleTimeline = useMemo(() => showFullTimeline ? timeline : timeline.slice(0, 8), [showFullTimeline, timeline])
   if (loading) return <div className="page-wrap lead-detail-page"><LoadingState label="Carregando lead…" /></div>
   if (error && !lead) return <div className="page-wrap lead-detail-page"><ErrorState onRetry={() => void load()}>Não foi possível carregar este lead. Tente novamente.</ErrorState><Link className="text-link" to="/leads">Voltar para prospecção</Link></div>
@@ -75,7 +86,7 @@ export function LeadDetailPage() {
     {notice && <div className="notice notice--success" role="status">{notice}<button className="notice-dismiss" onClick={() => setNotice(null)} aria-label="Dispensar mensagem"><Icon name="close" /></button></div>}
     {error && <ErrorState>{error}</ErrorState>}
     <section className="lead-detail-heading"><div className="lead-detail-title"><p className="eyebrow">LEAD / {lead.niche?.name ?? 'SEM NICHO'}</p><h1>{lead.company_name}</h1><div className="detail-badges"><LeadStatusBadge status={lead.status} />{lead.is_blocked && <span className="blocked-label">Prospecção bloqueada</span>}{lead.is_archived && <span className="archive-label">Arquivado</span>}</div></div>
-      <div className="detail-actions"><Link className="button button--secondary" to={`/leads/${lead.id}/editar`}><Icon name="file" />Editar</Link>{whatsappUrl ? <a className="button button--primary" href={whatsappUrl} target="_blank" rel="noreferrer"><Icon name="message" />Abrir WhatsApp</a> : <button className="button button--primary" disabled title="Adicione um WhatsApp para habilitar esta ação"><Icon name="message" />Abrir WhatsApp</button>}</div>
+      <div className="detail-actions">{lead.status === 'won' && (clientId ? <Link className="button button--secondary" to={`/clientes/${clientId}`}><Icon name="briefcase" />Ver cliente</Link> : <Button variant="primary" onClick={() => void convertLead()} disabled={converting || saving}><Icon name="briefcase" />{converting ? 'Convertendo…' : 'Converter em cliente'}</Button>)}<Link className="button button--secondary" to={`/leads/${lead.id}/editar`}><Icon name="file" />Editar</Link>{whatsappUrl ? <a className="button button--primary" href={whatsappUrl} target="_blank" rel="noreferrer"><Icon name="message" />Abrir WhatsApp</a> : <button className="button button--primary" disabled title="Adicione um WhatsApp para habilitar esta ação"><Icon name="message" />Abrir WhatsApp</button>}</div>
     </section>
     <div className="lead-detail-grid"><div className="detail-main-column">
       <section className="dashboard-section lead-info-section"><div className="section-heading"><div><h2>Informações do lead</h2><p>Dados de contato e origem</p></div></div><dl className="lead-info-grid">
